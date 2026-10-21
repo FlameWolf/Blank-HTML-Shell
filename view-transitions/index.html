@@ -1276,10 +1276,10 @@ document.activeViewTransition;             // null: the document isn't transitio
       <ul>
         <li>Both the old and the new page must opt in with <code>@view-transition { navigation: auto; }</code>. This guide doesn't, so the link above won't animate, but moving between the planet pages will.</li>
         <li>The navigation must be same-origin, with no cross-origin redirects.</li>
-        <li>It must be a <code>push</code>, <code>replace</code> or <code>traverse</code> (back/forward) navigation. A push or replace must be started by the user interacting with the page, not by the browser's own UI such as the address bar or bookmarks. Reloads never animate.</li>
+        <li>It must be a <code>push</code>, <code>replace</code> or <code>traverse</code> (back/forward) navigation. A push or replace started from the browser's own UI, such as the address bar or a bookmark, doesn't animate, and neither does a reload.</li>
       </ul>
       <h3>Customising it with JavaScript</h3>
-      <p>Two events let each page join in. In both, <code>event.viewTransition</code> is a <code>ViewTransition</code> object, or <code>null</code> if no transition will run:</p>
+      <p>Two events let each page join in. In both, <code>event.viewTransition</code> is a <code>ViewTransition</code> object, or <code>null</code> if there's no transition. In <code>pageswap</code> the transition can still be skipped afterwards, because the old page can't know yet whether the new page opts in:</p>
 <pre><code>// Old page, just before it is replaced. Runs on the outgoing document.
 window.addEventListener('pageswap', (event) =&gt; {
   if (event.viewTransition) {
@@ -1402,6 +1402,8 @@ window.addEventListener('pagereveal', (event) =&gt; {
     allowMotionToggle.addEventListener('change', () => {
       root.classList.toggle('allow-motion', allowMotionToggle.checked);
     });
+    // Browsers can restore a checkbox's state on reload without firing change.
+    root.classList.toggle('allow-motion', allowMotionToggle.checked);
     if (typeof document.startViewTransition !== 'function') {
       $('#unsupported-banner').hidden = false;
     }
@@ -1564,7 +1566,12 @@ window.addEventListener('pagereveal', (event) =&gt; {
         return item;
       }));
       $('#deck-empty').hidden = deck.length > 0;
-      addFruitButton.disabled = deck.length === FRUITS.length;
+      const full = deck.length === FRUITS.length;
+      if (full && document.activeElement === addFruitButton) {
+        // A disabled button can't keep focus, so move it somewhere useful first.
+        $('[data-deck="shuffle"]').focus({ preventScroll: true });
+      }
+      addFruitButton.disabled = full;
     }
 
     function updateDeck(nextDeck, announcement, afterRender) {
@@ -1628,9 +1635,11 @@ window.addEventListener('pagereveal', (event) =&gt; {
       });
     });
 
-    $('#deck-named').addEventListener('change', (event) => {
-      deckList.classList.toggle('is-named', event.target.checked);
+    const deckNamedToggle = $('#deck-named');
+    deckNamedToggle.addEventListener('change', () => {
+      deckList.classList.toggle('is-named', deckNamedToggle.checked);
     });
+    deckList.classList.toggle('is-named', deckNamedToggle.checked); // in case the browser restored it
     renderDeck();
 
     // =========================================================================
@@ -1933,9 +1942,14 @@ window.addEventListener('pagereveal', (event) =&gt; {
     function runScenario(name) {
       const scenario = SCENARIOS[name];
       const started = performance.now();
-      const log = (text, kind) => addLogLine(text, kind, `+${Math.round(performance.now() - started)} ms`);
-      runCount += 1;
-      addLogLine(`Run ${runCount}: ${scenario.title}`, 'heading');
+      const run = (runCount += 1);
+      // Lines that arrive after a newer run has started are labelled with their own run.
+      const log = (text, kind) => addLogLine(
+        run === runCount ? text : `(Run ${run}) ${text}`,
+        kind,
+        `+${Math.round(performance.now() - started)} ms`,
+      );
+      addLogLine(`Run ${run}: ${scenario.title}`, 'heading');
 
       if (typeof document.startViewTransition !== 'function') {
         advanceStage();
@@ -1993,7 +2007,9 @@ window.addEventListener('pagereveal', (event) =&gt; {
       $('.flashcard-flip', card).textContent = side === 'question' ? 'Show the answer' : 'Show the question';
     }
 
+    let flipRun = 0;
     function flipCards(indexes) {
+      const run = (flipRun += 1);
       const transitions = indexes.map((index) => {
         flashcardSides[index] = flashcardSides[index] === 'question' ? 'answer' : 'question';
         // Same helper as everywhere else, but scoped to the card element.
@@ -2015,7 +2031,8 @@ window.addEventListener('pagereveal', (event) =&gt; {
         `Each card's activeViewTransition is its own transition: ${ownTransitions}. ` +
         `document.activeViewTransition: ${'activeViewTransition' in document ? String(document.activeViewTransition) : 'not supported'}.`;
       Promise.allSettled(running.map((transition) => transition.finished)).then(() => {
-        scopedStatus.textContent += ' All finished.';
+        // Only the latest flip owns the status message.
+        if (run === flipRun) scopedStatus.textContent += ' All finished.';
       });
     }
 

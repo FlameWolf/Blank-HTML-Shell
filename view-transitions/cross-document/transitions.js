@@ -16,17 +16,23 @@
   const LABELS = { index: 'Overview', mercury: 'Mercury', venus: 'Venus', earth: 'Earth', mars: 'Mars' };
   const STORAGE_KEY = 'cross-document-demo:last-page';
 
-  /** ".../mars.html" -> "mars". Anything else (such as ".../cross-document/") -> "index". */
+  /**
+   * ".../mars.html" -> "mars"; the overview (".../index.html" or ".../cross-document/") -> "index".
+   * Pages outside this demo, such as the guide, -> null.
+   */
   function pageName(url) {
-    const match = /([\w-]+)\.html$/.exec(new URL(url, location.href).pathname);
-    return match && PAGES.includes(match[1]) ? match[1] : 'index';
+    const target = new URL(url, location.href);
+    if (new URL('.', target).href !== new URL('.', location.href).href) return null;
+    const match = /([\w-]+)\.html$/.exec(target.pathname);
+    if (!match) return 'index';
+    return PAGES.includes(match[1]) ? match[1] : null;
   }
 
-  /** The transition type for a navigation, or null if it stays on one page. */
+  /** The transition type for a navigation, or null if there isn't a suitable one. */
   function typeFor(fromUrl, toUrl) {
     const from = pageName(fromUrl);
     const to = pageName(toUrl);
-    if (from === to) return null;
+    if (!from || !to || from === to) return null;
     if (from === 'index') return 'drill-in';
     if (to === 'index') return 'drill-out';
     return PAGES.indexOf(to) > PAGES.indexOf(from) ? 'forwards' : 'backwards';
@@ -37,18 +43,26 @@
   // Types added here apply while the old page's snapshots are captured.
   // ---------------------------------------------------------------------------
   window.addEventListener('pageswap', (event) => {
+    // event.activation describes the navigation; entry.url is the destination.
+    // It is null for cross-origin navigations, which never transition anyway.
+    const destination = event.activation?.entry?.url ?? null;
+
     // Fallback for browsers without navigation.activation: remember where the
-    // user is coming from, for the next page's pagereveal handler.
+    // user is coming from (and going to), for the next page's pagereveal handler.
     try {
-      sessionStorage.setItem(STORAGE_KEY, location.href);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ from: location.href, to: destination }));
     } catch {
       // Storage can be unavailable (for example in some private modes).
     }
 
-    // event.activation describes the navigation; entry.url is the destination.
-    // It is null for cross-origin navigations, which never transition anyway.
-    if (!event.viewTransition || !event.activation?.entry?.url) return;
-    const type = typeFor(location.href, event.activation.entry.url);
+    if (!event.viewTransition) return;
+    // The transition can still be skipped, for example because the new page
+    // doesn't opt in (like the guide this demo links back to). Skipping
+    // rejects `ready`, so don't leave that rejection unhandled.
+    event.viewTransition.ready.catch(() => {});
+
+    if (!destination) return;
+    const type = typeFor(location.href, destination);
     if (type) event.viewTransition.types.add(type);
   });
 
@@ -63,8 +77,11 @@
     let fromUrl = null;
     let storedFrom = null;
     try {
-      storedFrom = sessionStorage.getItem(STORAGE_KEY);
+      const raw = sessionStorage.getItem(STORAGE_KEY);
       sessionStorage.removeItem(STORAGE_KEY);
+      const stored = JSON.parse(raw);
+      // Ignore a value left behind by a navigation that went somewhere else.
+      if (stored && (!stored.to || stored.to === location.href)) storedFrom = stored.from;
     } catch {
       // Ignore: storage is only a fallback.
     }
@@ -78,9 +95,11 @@
       fromUrl = storedFrom;
       info.navigation = 'unknown (no Navigation API)';
     }
-    info.from = fromUrl ? LABELS[pageName(fromUrl)] : '-';
+    info.from = fromUrl ? (LABELS[pageName(fromUrl)] ?? 'A page outside this demo') : '-';
 
     if (event.viewTransition) {
+      // It can still be skipped (for example if the user navigates again straight away).
+      event.viewTransition.ready.catch(() => {});
       const type = fromUrl ? typeFor(fromUrl, location.href) : null;
       if (type) event.viewTransition.types.add(type);
       info.transition = 'Yes';
