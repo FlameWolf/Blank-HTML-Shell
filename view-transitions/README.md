@@ -18,9 +18,9 @@ An interactive, dependency-free guide to the [View Transition API](https://devel
 1. **How a view transition works**: the capture, update and animate steps, the `::view-transition` pseudo-element tree, and the browser's default animations.
 2. **Browser support**: a support table with live feature detection for the browser you're using.
 3. **The default cross-fade**: `document.startViewTransition()` with no extra CSS.
-4. **Morphing a thumbnail into a detail view**: shared `view-transition-name`s, `overflow: clip` on a group, and focus management.
+4. **Morphing a thumbnail into a detail view**: shared `view-transition-name`s that move from one element to another, and focus management.
 5. **Adding, removing and reordering items**: per-item names, `view-transition-class`, and separate enter and exit animations.
-6. **Transition types**: one carousel with slide, flip, zoom and cross-fade animations, picked with `startViewTransition({ types })` and `:active-view-transition-type()`.
+6. **Transition types**: one carousel with slide, flip, zoom and cross-fade animations, picked with `startViewTransition({ types })` and `:active-view-transition-type()`, and clipped to the carousel with `overflow: clip` on the group.
 7. **A circular theme reveal**: animating `::view-transition-new(root)` from JavaScript with the Web Animations API once `transition.ready` resolves.
 8. **The `ViewTransition` object**: a live log of `updateCallbackDone`, `ready` and `finished`, plus `skipTransition()`, interruptions, errors, duplicate names, the update timeout and `waitUntil()`.
 9. **Element-scoped view transitions**: `element.startViewTransition()`, with two transitions running at once.
@@ -64,6 +64,6 @@ First version with support, from MDN's browser-compat-data (October 2026). Edge 
 
 ## Notes
 
-- **Experimental features are optional.** The scoped-transition demo and the `waitUntil()` scenario explain themselves and turn off when the browser lacks them. Everything else uses features available in all major engines.
+- **Experimental features are optional.** Without `element.startViewTransition()`, the flashcards in the scoped demo still flip, just without animation, and say so. Without `waitUntil()`, its scenario button is disabled with a note. The other same-document demos only use features that all major engines support.
 - **Names are set explicitly.** The list demo gives each item its own `view-transition-name` rather than using `match-element`, because there's no reliable way to feature-detect `match-element`.
-- **The duplicate-name scenario logs an error on purpose.** In the `ViewTransition` demo, "Duplicate names" makes the browser report an `InvalidStateError` in the console, to show what happens when two elements share a name.
+- **The duplicate-name scenario logs an error on purpose.** In the `ViewTransition` demo, "Duplicate names" gives two elements the same name. The transition is skipped, `ready` rejects with an `InvalidStateError`, and the browser reports "Unexpected duplicate view-transition-name" in the console.

@@ -119,6 +119,7 @@ h1 { line-height: 1.1; }
 @media (max-width: 40rem) {
   .planet-hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
   .planet-hero .orb { width: min(13rem, 65vw); }
+  .planet-title { margin-inline: auto; }
 }
 .facts {
   display: grid;
