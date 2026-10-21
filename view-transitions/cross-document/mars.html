@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mars · Cross-document view transitions</title>
+  <link rel="expect" href="#main-content" blocking="render">
+  <link rel="stylesheet" href="styles.css">
+  <script src="transitions.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Inner planets</a>
+    <a href="../index.html">← Back to the View Transitions guide</a>
+  </header>
+
+  <main id="main-content">
+    <article>
+      <div class="planet-hero">
+        <!-- Same names as the card on index.html, so the two morph into each other. -->
+        <span class="orb planet-mars" style="view-transition-name: orb-mars; view-transition-class: orb"></span>
+        <div>
+          <p class="planet-kicker">Fourth planet from the Sun</p>
+          <h1 class="planet-title" style="view-transition-name: name-mars; view-transition-class: planet-name">Mars</h1>
+          <p>
+            A cold, dusty desert with the largest volcano in the solar system, Olympus Mons, and two small moons,
+            Phobos and Deimos.
+          </p>
+        </div>
+      </div>
+
+      <dl class="facts">
+        <div><dt>Diameter</dt><dd>6,792 km</dd></div>
+        <div><dt>Day (sunrise to sunrise)</dt><dd>24.7 hours</dd></div>
+        <div><dt>Year</dt><dd>687 Earth days</dd></div>
+        <div><dt>Moons</dt><dd>2</dd></div>
+        <div><dt>Distance from the Sun</dt><dd>228.0 million km</dd></div>
+        <div><dt>Mean temperature</dt><dd>−65 °C</dd></div>
+      </dl>
+
+      <nav class="pager" aria-label="Planets">
+        <a href="earth.html" rel="prev">← Earth</a>
+        <a href="index.html">All planets</a>
+      </nav>
+    </article>
+
+    <aside class="vt-info" aria-labelledby="vt-info-title">
+      <h2 id="vt-info-title">How did we get here?</h2>
+      <dl>
+        <div><dt>View transition</dt><dd data-info="transition">-</dd></div>
+        <div><dt>Navigation type</dt><dd data-info="navigation">-</dd></div>
+        <div><dt>Came from</dt><dd data-info="from">-</dd></div>
+        <div><dt>Transition types</dt><dd data-info="types">-</dd></div>
+      </dl>
+      <p>Filled in by the <code>pagereveal</code> listener in <code>transitions.js</code>.</p>
+    </aside>
+  </main>
+</body>
+</html>
