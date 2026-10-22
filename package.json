@@ -1,0 +1,9 @@
+{
+	"name": "trajectory-lab",
+	"version": "1.0.0",
+	"description": "A plain JavaScript projectile motion simulator powered by Matter.js",
+	"private": true,
+	"dependencies": {
+		"matter-js": "0.20.0"
+	}
+}
