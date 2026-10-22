@@ -21,7 +21,7 @@ For static hosting, include `index.html`, `styles.css`, `script.js`, and `node_m
 
 ### Physics
 
-The simulator models a point projectile without air resistance. Matter.js advances at a fixed 120 Hz in meter-based world coordinates; resizing only changes rendering. A half-step initial velocity correction aligns Verlet integration with the ideal ballistic trajectory. Ground crossing is interpolated between steps and ends the flight (no bounce). Peak height is the highest sampled point, and the final speed is the speed at impact. Hidden tabs pause automatically.
+The simulator models a point projectile without air resistance. Matter.js advances at a fixed 120 Hz in meter-based world coordinates; resizing only changes rendering. A half-step initial velocity correction aligns Verlet integration with the ideal ballistic trajectory. Ground crossing is resolved within the final step using the ballistic intersection time and ends the flight (no bounce). Peak height is the highest sampled point, and the final speed is the speed at impact. Hidden tabs pause automatically.
 
 There are no build, lint, or test scripts in this repository. To check manually, launch the defaults (45°, 20 m/s, zero height, Earth): flight time should be about 2.88 s, range 40.77 m, and peak height 10.19 m. Also check pause/resume, reset, a vertical launch, launch from a height, planet presets, both themes, and narrow-screen layouts.
 

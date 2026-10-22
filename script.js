@@ -212,7 +212,9 @@
 		};
 		let fraction = 1;
 		if (position.y <= 0 && velocity.y <= 0) {
-			fraction = previous.y > 0 ? previous.y / (previous.y - position.y) : 0;
+			// Resolve the ground intersection even when the entire flight fits in one step.
+			const impactTime = (previousVelocity.y + Math.sqrt(previousVelocity.y ** 2 + 2 * settings.gravity * previous.y)) / settings.gravity;
+			fraction = Math.min(1, Math.max(0, impactTime / (STEP / 1000)));
 			position = { x: previous.x + (position.x - previous.x) * fraction, y: 0 };
 			velocity.y = previousVelocity.y + (velocity.y - previousVelocity.y) * fraction;
 			Body.setPosition(projectile, { x: position.x, y: 0 });
