@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inner planets · Cross-document view transitions</title>
+  <!-- Don't render (or capture) this page until <main> has been parsed. -->
+  <link rel="expect" href="#main-content" blocking="render">
+  <!-- styles.css contains the @view-transition opt-in and all the animations. -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Classic script in the <head>: its pagereveal listener must exist before the first frame. -->
+  <script src="transitions.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Inner planets</a>
+    <a href="../index.html">← Back to the View Transitions guide</a>
+  </header>
+
+  <main id="main-content">
+    <h1>The inner planets</h1>
+    <p class="intro">
+      Pick a planet. Each card's planet and name share a <code>view-transition-name</code> with the big
+      versions on the planet's own page, so they morph from one page to the next. On a planet page, the
+      previous and next links slide the page sideways instead. Try the browser's Back button too.
+    </p>
+
+    <ul class="planet-grid">
+      <li>
+        <a class="planet-card" href="mercury.html">
+          <span class="orb planet-mercury" style="view-transition-name: orb-mercury; view-transition-class: orb"></span>
+          <span class="planet-name" style="view-transition-name: name-mercury; view-transition-class: planet-name">Mercury</span>
+          <span class="planet-tagline">Smallest, and closest to the Sun</span>
+        </a>
+      </li>
+      <li>
+        <a class="planet-card" href="venus.html">
+          <span class="orb planet-venus" style="view-transition-name: orb-venus; view-transition-class: orb"></span>
+          <span class="planet-name" style="view-transition-name: name-venus; view-transition-class: planet-name">Venus</span>
+          <span class="planet-tagline">The hottest planet</span>
+        </a>
+      </li>
+      <li>
+        <a class="planet-card" href="earth.html">
+          <span class="orb planet-earth" style="view-transition-name: orb-earth; view-transition-class: orb"></span>
+          <span class="planet-name" style="view-transition-name: name-earth; view-transition-class: planet-name">Earth</span>
+          <span class="planet-tagline">Home, with one Moon</span>
+        </a>
+      </li>
+      <li>
+        <a class="planet-card" href="mars.html">
+          <span class="orb planet-mars" style="view-transition-name: orb-mars; view-transition-class: orb"></span>
+          <span class="planet-name" style="view-transition-name: name-mars; view-transition-class: planet-name">Mars</span>
+          <span class="planet-tagline">The red planet</span>
+        </a>
+      </li>
+    </ul>
+
+    <aside class="vt-info" aria-labelledby="vt-info-title">
+      <h2 id="vt-info-title">How did we get here?</h2>
+      <dl>
+        <div><dt>View transition</dt><dd data-info="transition">-</dd></div>
+        <div><dt>Navigation type</dt><dd data-info="navigation">-</dd></div>
+        <div><dt>Came from</dt><dd data-info="from">-</dd></div>
+        <div><dt>Transition types</dt><dd data-info="types">-</dd></div>
+      </dl>
+      <p>Filled in by the <code>pagereveal</code> listener in <code>transitions.js</code>.</p>
+    </aside>
+
+    <section aria-labelledby="how-title">
+      <h2 id="how-title">What makes this work</h2>
+      <ol>
+        <li><code>@view-transition { navigation: auto; }</code> in <code>styles.css</code>, which every page loads. Both the old and the new page must opt in.</li>
+        <li>Matching names on both pages, for example <code>view-transition-name: orb-mars</code> on the card above and on the big Mars.</li>
+        <li><code>view-transition-name: site-header</code> keeps the header still while the page changes under it.</li>
+        <li>The <code>pageswap</code> (old page) and <code>pagereveal</code> (new page) listeners in <code>transitions.js</code> add a type: <code>drill-in</code>, <code>drill-out</code>, <code>forwards</code> or <code>backwards</code>. The CSS selects animations with <code>:active-view-transition-type()</code>.</li>
+        <li><code>&lt;link rel="expect" href="#main-content" blocking="render"&gt;</code> holds the new page's first frame until <code>&lt;main&gt;</code> has been parsed, so the new snapshot is complete.</li>
+      </ol>
+      <p>
+        Cross-document transitions only run for same-origin navigations. Chrome also runs them for pages opened
+        straight from disk, but serving the folder over HTTP is the dependable way to try them (see the README).
+      </p>
+    </section>
+  </main>
+</body>
+</html>

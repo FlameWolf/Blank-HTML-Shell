@@ -1,0 +1,191 @@
+/*
+ * Cross-document view transitions demo: styles shared by every page.
+ */
+
+/* 1. Opt in to cross-document view transitions. BOTH the page you leave and
+ *    the page you arrive at need this rule. The media query means users who
+ *    prefer reduced motion get ordinary, instant navigations. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f5f6fb, #0b0d14);
+  --surface: light-dark(#ffffff, #151824);
+  --text: light-dark(#1a1c27, #e9eaf2);
+  --muted: light-dark(#565b70, #a5a9bc);
+  --border: light-dark(#d9dce8, #2c3142);
+  --accent: light-dark(#4b3bd1, #a99cff);
+  --radius: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+a { color: var(--accent); }
+code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 0.9em; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+/* 2. The sticky header has its own name, so it stays perfectly still while
+ *    the rest of the page animates underneath it. */
+.site-header {
+  view-transition-name: site-header;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem clamp(1rem, 4vw, 2rem);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.brand { font-weight: 700; color: var(--text); text-decoration: none; }
+
+main { max-width: 60rem; margin: 0 auto; padding: 2rem clamp(1rem, 4vw, 2rem) 4rem; }
+h1 { line-height: 1.1; }
+.intro { max-width: 44rem; color: var(--muted); }
+
+/* Planets are CSS gradients, so the demo has no image files. */
+.orb { display: block; aspect-ratio: 1; border-radius: 50%; background: var(--orb); }
+.planet-mercury { --orb: radial-gradient(circle at 35% 30%, #ece7e1, #a59d94 45%, #4d4741); }
+.planet-venus { --orb: radial-gradient(circle at 35% 30%, #fff3cf, #e3b45f 45%, #8f5f24); }
+.planet-earth {
+  --orb:
+    radial-gradient(circle at 62% 38%, #3f9a52 0 13%, transparent 13.5%),
+    radial-gradient(circle at 34% 64%, #3f9a52 0 10%, transparent 10.5%),
+    radial-gradient(circle at 35% 30%, #c4ecff, #2f7fc4 45%, #143a70);
+}
+.planet-mars { --orb: radial-gradient(circle at 35% 30%, #ffc9a6, #d4612f 45%, #6e2411); }
+
+/* Text snapshots should hug the text, so the name morph scales the words. */
+.planet-name, .planet-title { width: fit-content; }
+
+/* Overview page */
+.planet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+.planet-card {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  height: 100%;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.planet-card:hover { border-color: var(--accent); }
+.planet-card .orb { width: 7rem; }
+.planet-card .planet-name { font-size: 1.3rem; font-weight: 700; }
+.planet-tagline { font-size: 0.9rem; color: var(--muted); }
+
+/* Planet pages */
+.planet-hero {
+  display: grid;
+  grid-template-columns: minmax(8rem, 15rem) 1fr;
+  gap: 1.5rem 2.5rem;
+  align-items: center;
+}
+.planet-hero .orb { width: 100%; }
+.planet-kicker {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.planet-title { margin: 0.2rem 0 0.5rem; font-size: clamp(2.5rem, 8vw, 4rem); }
+@media (max-width: 40rem) {
+  .planet-hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .planet-hero .orb { width: min(13rem, 65vw); }
+  .planet-title { margin-inline: auto; }
+}
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: 0.75rem;
+  margin: 2rem 0;
+}
+.facts div { padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.facts dt { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 0.2rem 0 0; font-size: 1.1rem; font-weight: 600; }
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  font-weight: 600;
+  border-top: 1px solid var(--border);
+}
+
+/* "How did we get here?" panel, filled in by transitions.js */
+.vt-info {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+.vt-info h2 { margin: 0 0 0.5rem; font-size: 1rem; }
+.vt-info dl { display: grid; gap: 0.25rem; margin: 0; font-size: 0.92rem; }
+.vt-info dl div { display: flex; flex-wrap: wrap; gap: 0 1rem; }
+.vt-info dt { min-width: 9rem; color: var(--muted); }
+.vt-info dd { margin: 0; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+.vt-info p { margin: 0.75rem 0 0; font-size: 0.88rem; color: var(--muted); }
+
+/* ===========================================================================
+ * 3. The transitions
+ *
+ * Each planet and its name carry the same inline view-transition-name on the
+ * overview page and on the planet's own page, for example
+ *   style="view-transition-name: orb-mars; view-transition-class: orb"
+ * so they morph between the two pages. transitions.js adds a type to every
+ * navigation: drill-in, drill-out, forwards or backwards.
+ * ======================================================================== */
+
+/* Overview <-> planet: a slightly slower, springier morph. */
+::view-transition-group(.orb),
+::view-transition-group(.planet-name) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Planet <-> planet: slide the whole page sideways (the header stays put).
+ * The direction type becomes a number that the keyframes multiply by. */
+html:active-view-transition-type(forwards) { --direction: 1; }
+html:active-view-transition-type(backwards) { --direction: -1; }
+
+html:active-view-transition-type(forwards, backwards)::view-transition-old(root),
+html:active-view-transition-type(forwards, backwards)::view-transition-old(.orb),
+html:active-view-transition-type(forwards, backwards)::view-transition-old(.planet-name) {
+  animation: slide-out 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+html:active-view-transition-type(forwards, backwards)::view-transition-new(root),
+html:active-view-transition-type(forwards, backwards)::view-transition-new(.orb),
+html:active-view-transition-type(forwards, backwards)::view-transition-new(.planet-name) {
+  animation: slide-in 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes slide-out { to { transform: translateX(calc(-100vw * var(--direction, 1))); } }
+@keyframes slide-in { from { transform: translateX(calc(100vw * var(--direction, 1))); } }

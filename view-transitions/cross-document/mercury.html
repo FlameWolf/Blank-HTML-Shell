@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mercury · Cross-document view transitions</title>
+  <link rel="expect" href="#main-content" blocking="render">
+  <link rel="stylesheet" href="styles.css">
+  <script src="transitions.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Inner planets</a>
+    <a href="../index.html">← Back to the View Transitions guide</a>
+  </header>
+
+  <main id="main-content">
+    <article>
+      <div class="planet-hero">
+        <!-- Same names as the card on index.html, so the two morph into each other. -->
+        <span class="orb planet-mercury" style="view-transition-name: orb-mercury; view-transition-class: orb"></span>
+        <div>
+          <p class="planet-kicker">First planet from the Sun</p>
+          <h1 class="planet-title" style="view-transition-name: name-mercury; view-transition-class: planet-name">Mercury</h1>
+          <p>
+            The smallest planet, and the closest to the Sun. With almost no atmosphere to hold heat, its surface
+            swings from about 430 °C in the day to −180 °C at night.
+          </p>
+        </div>
+      </div>
+
+      <dl class="facts">
+        <div><dt>Diameter</dt><dd>4,879 km</dd></div>
+        <div><dt>Day (sunrise to sunrise)</dt><dd>4,222.6 hours</dd></div>
+        <div><dt>Year</dt><dd>88 Earth days</dd></div>
+        <div><dt>Moons</dt><dd>0</dd></div>
+        <div><dt>Distance from the Sun</dt><dd>57.9 million km</dd></div>
+        <div><dt>Surface temperature</dt><dd>430 °C to −180 °C</dd></div>
+      </dl>
+
+      <nav class="pager" aria-label="Planets">
+        <a href="index.html">All planets</a>
+        <a href="venus.html" rel="next">Venus →</a>
+      </nav>
+    </article>
+
+    <aside class="vt-info" aria-labelledby="vt-info-title">
+      <h2 id="vt-info-title">How did we get here?</h2>
+      <dl>
+        <div><dt>View transition</dt><dd data-info="transition">-</dd></div>
+        <div><dt>Navigation type</dt><dd data-info="navigation">-</dd></div>
+        <div><dt>Came from</dt><dd data-info="from">-</dd></div>
+        <div><dt>Transition types</dt><dd data-info="types">-</dd></div>
+      </dl>
+      <p>Filled in by the <code>pagereveal</code> listener in <code>transitions.js</code>.</p>
+    </aside>
+  </main>
+</body>
+</html>
