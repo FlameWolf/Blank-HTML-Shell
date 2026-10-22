@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="color-scheme" content="light dark">
+		<meta name="description" content="A little physics, a lot of possibility. Explore projectile motion with an interactive Matter.js physics playground.">
+		<title>Trajectory — Projectile motion lab</title>
+		<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%237356e8'/%3E%3Cpath d='M9 29Q20 0 31 20' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='31' cy='20' r='4' fill='white'/%3E%3C/svg%3E">
+		<link rel="stylesheet" href="styles.css">
+		<script src="node_modules/matter-js/build/matter.min.js" defer></script>
+		<script src="script.js" defer></script>
+	</head>
+	<body>
+		<svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+			<symbol id="icon-trajectory" viewBox="0 0 24 24">
+				<path d="M4 19C8 2 16 2 20 11" />
+				<circle cx="20" cy="11" r="2" />
+				<path d="M4 19h16" opacity=".5" />
+			</symbol>
+			<symbol id="icon-sun" viewBox="0 0 24 24">
+				<circle cx="12" cy="12" r="4" />
+				<path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" />
+			</symbol>
+			<symbol id="icon-moon" viewBox="0 0 24 24">
+				<path d="M20.8 13A9 9 0 0 1 11 3.2 9 9 0 1 0 20.8 13Z" />
+			</symbol>
+			<symbol id="icon-sliders" viewBox="0 0 24 24">
+				<path d="M4 7h7m4 0h5M4 17h3m4 0h9" />
+				<circle cx="13" cy="7" r="2" />
+				<circle cx="9" cy="17" r="2" />
+			</symbol>
+			<symbol id="icon-play" viewBox="0 0 24 24">
+				<path d="m9 5 11 7-11 7Z" />
+			</symbol>
+			<symbol id="icon-reset" viewBox="0 0 24 24">
+				<path d="M4 10a8 8 0 1 1 1 7M4 4v6h6" />
+			</symbol>
+			<symbol id="icon-arrow" viewBox="0 0 24 24">
+				<path d="M5 19 19 5M6 5h13v13" />
+			</symbol>
+			<symbol id="icon-clock" viewBox="0 0 24 24">
+				<circle cx="12" cy="12" r="8" />
+				<path d="M12 7v5l3 2" />
+			</symbol>
+			<symbol id="icon-width" viewBox="0 0 24 24">
+				<path d="M3 7v10m18-10v10M3 12h18M7 8l-4 4 4 4m10-8 4 4-4 4" />
+			</symbol>
+			<symbol id="icon-height" viewBox="0 0 24 24">
+				<path d="M7 3h10M7 21h10M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4" />
+			</symbol>
+			<symbol id="icon-speed" viewBox="0 0 24 24">
+				<path d="M5 19a9 9 0 1 1 14 0M12 13l4-5M4 13h2m12 0h2M12 4v2" />
+				<circle cx="12" cy="13" r="1" />
+			</symbol>
+		</svg>
+
+		<a class="skip-link" href="#main">Skip to simulator</a>
+		<header class="site-header">
+			<a class="brand" href="./" aria-label="Trajectory home">
+				<span class="brand-mark"><svg class="icon"><use href="#icon-trajectory" /></svg></span>
+				<span>trajectory<span class="brand-dot">.</span></span>
+			</a>
+			<div class="header-actions">
+				<a class="engine-credit" href="https://brm.io/matter-js/" target="_blank" rel="noopener noreferrer"><span class="status-dot"></span>Powered by Matter.js<svg class="icon"><use href="#icon-arrow" /></svg></a>
+				<span class="header-divider"></span>
+				<button id="theme-toggle" class="icon-button" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+					<svg class="icon theme-moon"><use href="#icon-moon" /></svg>
+					<svg class="icon theme-sun"><use href="#icon-sun" /></svg>
+				</button>
+			</div>
+		</header>
+
+		<main id="main">
+			<section class="intro" aria-labelledby="page-title">
+				<div>
+					<p class="eyebrow"><span></span>YOUR EVERYDAY PHYSICS PLAYGROUND</p>
+					<h1 id="page-title">Projectile motion<span>.</span></h1>
+					<p class="intro-description">Set it up. Let it fly. See the science in motion.</p>
+				</div>
+				<div class="lab-label"><span>EXPERIMENT 001</span><span>Curiosity, meet gravity.<svg class="icon"><use href="#icon-arrow" /></svg></span></div>
+			</section>
+
+			<noscript><p class="error-message">Enable JavaScript to use the simulator.</p></noscript>
+			<p id="load-error" class="error-message" role="alert" hidden>Matter.js could not load. Run <code>npm install</code> in the project folder, then reload this page.</p>
+
+			<div class="workspace">
+				<aside class="controls panel" aria-labelledby="controls-title">
+					<div class="panel-heading"><h2 id="controls-title"><svg class="icon"><use href="#icon-sliders" /></svg>Launch controls</h2><span class="small-label">01</span></div>
+					<fieldset id="launch-settings" disabled>
+						<legend class="visually-hidden">Projectile launch settings</legend>
+						<div class="parameter">
+							<div class="parameter-heading"><label for="angle">Launch angle</label><div class="number-field"><input id="angle-number" type="number" min="0" max="90" step="1" value="45" aria-label="Launch angle in degrees"><span>°</span></div></div>
+							<input id="angle" type="range" min="0" max="90" step="1" value="45">
+							<div class="range-labels"><span>0°</span><span>90°</span></div>
+						</div>
+						<div class="parameter">
+							<div class="parameter-heading"><label for="velocity">Initial velocity</label><div class="number-field"><input id="velocity-number" type="number" min="1" max="40" step="1" value="20" aria-label="Initial velocity in meters per second"><span>m/s</span></div></div>
+							<input id="velocity" type="range" min="1" max="40" step="1" value="20">
+							<div class="range-labels"><span>1 m/s</span><span>40 m/s</span></div>
+						</div>
+						<div class="parameter">
+							<div class="parameter-heading"><label for="height">Initial height</label><div class="number-field"><input id="height-number" type="number" min="0" max="20" step="1" value="0" aria-label="Initial height in meters"><span>m</span></div></div>
+							<input id="height" type="range" min="0" max="20" step="1" value="0">
+							<div class="range-labels"><span>0 m</span><span>20 m</span></div>
+						</div>
+						<div class="parameter">
+							<div class="parameter-heading"><label for="gravity">Gravity</label><div class="number-field"><input id="gravity-number" type="number" min="0.5" max="20" step="0.01" value="9.81" aria-label="Gravity in meters per second squared"><span>m/s²</span></div></div>
+							<input id="gravity" type="range" min="0.5" max="20" step="0.01" value="9.81">
+							<div class="range-labels"><span>0.5 m/s²</span><span>20 m/s²</span></div>
+						</div>
+						<div class="environment">
+							<p class="small-label">TRY ANOTHER WORLD</p>
+							<div class="planet-options" role="group" aria-label="Gravity presets">
+								<button type="button" data-gravity="9.81" aria-pressed="true"><span class="planet earth"></span>Earth</button>
+								<button type="button" data-gravity="1.62" aria-pressed="false"><span class="planet moon"></span>Moon</button>
+								<button type="button" data-gravity="3.71" aria-pressed="false"><span class="planet mars"></span>Mars</button>
+							</div>
+						</div>
+					</fieldset>
+					<div class="launch-actions">
+						<button id="launch" class="primary-button" type="button" disabled><svg class="icon"><use href="#icon-play" /></svg><span>Launch projectile</span></button>
+						<button id="reset" class="icon-button reset-button" type="button" aria-label="Reset simulation" title="Reset simulation" disabled><svg class="icon"><use href="#icon-reset" /></svg></button>
+					</div>
+					<p class="control-hint" id="control-hint">Your next great discovery is a launch away.</p>
+				</aside>
+
+				<section class="simulation panel" aria-labelledby="simulation-title">
+					<div class="simulation-heading">
+						<div><h2 id="simulation-title">The launch zone</h2><span class="simulation-subtitle">A small world. Endless trajectories.</span></div>
+						<span id="simulation-status" class="simulation-status" role="status"><span class="status-dot"></span><span id="status-text">Loading physics</span></span>
+					</div>
+					<div class="canvas-wrap">
+						<canvas id="simulation-canvas" role="img" aria-label="Projectile motion chart. Adjust the launch settings to preview a trajectory.">An animated projectile motion chart. Measurements are also shown below.</canvas>
+						<span class="axis-title">HEIGHT (m)</span>
+						<div class="chart-legend"><span><i class="legend-projectile"></i>Projectile</span><span><i class="legend-predicted"></i>Predicted path</span></div>
+						<div id="chart-tip" class="chart-tip"><svg class="icon"><use href="#icon-trajectory" /></svg><span>A little push. A perfect parabola.</span></div>
+						<span class="distance-title">DISTANCE (m)</span>
+					</div>
+					<div class="simulation-toolbar">
+						<div class="visual-options">
+							<label class="checkbox-label"><input id="show-trajectory" type="checkbox" checked><span>Trajectory</span></label>
+							<label class="checkbox-label"><input id="show-vectors" type="checkbox" checked><span>Velocity vector</span></label>
+						</div>
+						<label class="playback-speed" for="playback-speed"><svg class="icon"><use href="#icon-clock" /></svg><span class="visually-hidden">Playback speed</span><select id="playback-speed"><option value="0.25">0.25× speed</option><option value="0.5">0.5× speed</option><option value="1" selected>1× speed</option><option value="2">2× speed</option></select></label>
+					</div>
+				</section>
+			</div>
+
+			<section class="measurements" aria-label="Live measurements">
+				<article class="metric panel"><div class="metric-top"><span>Flight time</span><svg class="icon"><use href="#icon-clock" /></svg></div><div class="metric-value"><output id="metric-time">0.00</output><span>s</span></div><p>Time in the air</p></article>
+				<article class="metric panel"><div class="metric-top"><span>Horizontal distance</span><svg class="icon"><use href="#icon-width" /></svg></div><div class="metric-value"><output id="metric-distance">0.00</output><span>m</span></div><p>Distance from the launch point</p></article>
+				<article class="metric panel"><div class="metric-top"><span>Peak height</span><svg class="icon"><use href="#icon-height" /></svg></div><div class="metric-value"><output id="metric-height">0.00</output><span>m</span></div><p>Highest point reached</p></article>
+				<article class="metric panel"><div class="metric-top"><span>Current speed</span><svg class="icon"><use href="#icon-speed" /></svg></div><div class="metric-value"><output id="metric-speed">20.00</output><span>m/s</span></div><p id="speed-caption">Ready for liftoff</p></article>
+			</section>
+
+			<aside class="insight"><div class="insight-icon">↗</div><p><strong>A little food for thought</strong><span id="insight-text">On level ground, a 45° launch gives you the greatest range. Try a different angle and see for yourself.</span></p><span class="insight-tag">LEARN BY LAUNCHING</span></aside>
+		</main>
+		<footer class="site-footer"><span>Built for curious minds.</span><span>Ideal conditions <span class="footer-dot">·</span> No air resistance <span class="footer-dot">·</span> Real physics</span></footer>
+		<p id="flight-announcement" class="visually-hidden" role="status"></p>
+	</body>
+</html>
